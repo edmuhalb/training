@@ -22,7 +22,8 @@ class Database {
                     console.error('Ошибка подключения к базе данных:', err);
                     reject(err);
                 } else {
-                    console.log('Подключение к базе данных установлено');
+                    // eslint-disable-next-line no-console
+        console.log('Подключение к базе данных установлено');
                     this.createTables().then(resolve).catch(reject);
                 }
             });
