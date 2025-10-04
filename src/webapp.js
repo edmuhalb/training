@@ -347,5 +347,7 @@ module.exports = WebApp;
 // For Vercel serverless functions
 if (process.env.VERCEL) {
     const webapp = new WebApp();
+    // Initialize the app for Vercel
+    webapp.start().catch(console.error);
     module.exports = webapp.app;
 }
