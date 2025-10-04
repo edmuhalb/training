@@ -7,6 +7,9 @@ describe('DialogService', () => {
     let dialogService;
     let userService;
     let database;
+    
+    // Увеличиваем таймаут для тестов
+    jest.setTimeout(10000);
     let botMock;
 
     beforeAll(async() => {

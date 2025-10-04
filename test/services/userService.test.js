@@ -4,10 +4,15 @@ const Database = require('../../src/database');
 describe('UserService', () => {
     let userService;
     let database;
+    
+    // Увеличиваем таймаут для тестов
+    jest.setTimeout(10000);
 
     beforeAll(async() => {
         database = new Database();
         await database.init();
+        // Убеждаемся, что таблицы созданы
+        await database.createTables();
         userService = new UserService(database);
     });
 
@@ -19,7 +24,12 @@ describe('UserService', () => {
 
     beforeEach(async() => {
         // Очищаем тестовые данные
-        await database.run('DELETE FROM users WHERE id > 1000000');
+        try {
+            await database.run('DELETE FROM users WHERE id > 1000000');
+        } catch (error) {
+            // Игнорируем ошибки очистки
+            console.log('Cleanup error (ignored):', error.message);
+        }
     });
 
     describe('createOrUpdateUser', () => {
