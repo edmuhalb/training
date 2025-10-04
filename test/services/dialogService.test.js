@@ -15,6 +15,8 @@ describe('DialogService', () => {
     beforeAll(async() => {
         database = new Database();
         await database.init();
+        // Убеждаемся, что таблицы созданы
+        await database.createTables();
         userService = new UserService(database);
         dialogService = new DialogService(userService);
         botMock = new TelegramBotMock();
