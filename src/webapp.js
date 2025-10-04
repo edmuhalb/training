@@ -9,10 +9,10 @@ class WebApp {
     constructor() {
         this.app = express();
         this.database = new Database();
-        this.userService = new UserService(this.database);
-        this.cycleService = new CycleService(this.database);
-        this.workoutService = new WorkoutService(this.database);
-        this.maxWeightService = new (require('./services/maxWeightService'))(this.database);
+        this.userService = null;
+        this.cycleService = null;
+        this.workoutService = null;
+        this.maxWeightService = null;
 
         this.setupMiddleware();
         this.setupRoutes();
@@ -182,6 +182,9 @@ class WebApp {
     // Get user's workout plans
     async getWorkoutPlans(req, res) {
         try {
+            if (!this.workoutService) {
+                return res.status(503).json({ message: 'Service not initialized' });
+            }
             const userId = req.query.userId || 1;
             const plans = await this.workoutService.getUserWorkoutPlans(userId);
             res.json(plans);
@@ -198,6 +201,12 @@ class WebApp {
             await this.database.init();
             await this.database.createTables();
             console.log('Database initialized');
+
+            // Initialize services after database is ready
+            this.userService = new UserService(this.database);
+            this.cycleService = new CycleService(this.database);
+            this.workoutService = new WorkoutService(this.database);
+            this.maxWeightService = new (require('./services/maxWeightService'))(this.database);
 
             // Initialize default data
             await this.initializeDefaultData();

@@ -158,6 +158,7 @@ describe('UserService', () => {
             await userService.createOrUpdateUser(userData);
             const user = await userService.setGender(1234571, 'male');
 
+            expect(user).toBeDefined();
             expect(user.gender).toBe('male');
         });
     });
