@@ -107,7 +107,9 @@ describe('UserService', () => {
                 lastName: 'User3'
             };
 
-            await userService.createOrUpdateUser(userData);
+            const createdUser = await userService.createOrUpdateUser(userData);
+            expect(createdUser).toBeDefined();
+            expect(createdUser.id).toBe(1234569);
 
             const updateData = {
                 gender: 'male',
@@ -117,6 +119,7 @@ describe('UserService', () => {
 
             const user = await userService.updateUser(1234569, updateData);
 
+            expect(user).toBeDefined();
             expect(user.gender).toBe('male');
             expect(user.weight).toBe(75.5);
             expect(user.height).toBe(180);
