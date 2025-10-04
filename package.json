@@ -18,7 +18,8 @@
     "lint:fix": "eslint src/ test/ --fix",
     "security:check": "npm audit --audit-level moderate",
     "test:all": "npm run lint && npm run test && npm run test:integration",
-    "test:full": "node scripts/test-runner.js"
+    "test:full": "node scripts/test-runner.js",
+    "vercel-build": "echo 'Build completed'"
   },
   "keywords": ["telegram", "bot", "fitness", "training", "workout"],
   "author": "Your Name",

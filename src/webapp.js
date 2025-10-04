@@ -25,6 +25,11 @@ class WebApp {
         // Serve static files
         this.app.use(express.static(path.join(__dirname, '../public')));
         
+        // Serve index.html for root path
+        this.app.get('/', (req, res) => {
+            res.sendFile(path.join(__dirname, '../public/index.html'));
+        });
+        
         // CORS for Telegram WebApp
         this.app.use((req, res, next) => {
             res.header('Access-Control-Allow-Origin', '*');
@@ -326,4 +331,11 @@ if (require.main === module) {
     webapp.start(port);
 }
 
+// Export for Vercel
 module.exports = WebApp;
+
+// For Vercel serverless functions
+if (process.env.VERCEL) {
+    const webapp = new WebApp();
+    module.exports = webapp.app;
+}
