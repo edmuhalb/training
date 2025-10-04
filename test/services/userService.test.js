@@ -8,6 +8,7 @@ describe('UserService', () => {
     beforeAll(async() => {
         database = new Database();
         await database.init();
+        await database.createTables();
         userService = new UserService(database);
     });
 
@@ -155,12 +156,17 @@ describe('UserService', () => {
                 id: 1234572,
                 username: 'testuser6',
                 firstName: 'Test6',
-                lastName: 'User6'
+                lastName: 'User6',
+                gender: 'male',
+                weight: 70,
+                height: 175,
+                level: 'Начальный'
             };
 
             await userService.createOrUpdateUser(userData);
             const user = await userService.setWeight(1234572, 75.5);
 
+            expect(user).toBeDefined();
             expect(user.weight).toBe(75.5);
         });
 
@@ -186,12 +192,17 @@ describe('UserService', () => {
                 id: 1234574,
                 username: 'testuser8',
                 firstName: 'Test8',
-                lastName: 'User8'
+                lastName: 'User8',
+                gender: 'male',
+                weight: 70,
+                height: 175,
+                level: 'Начальный'
             };
 
             await userService.createOrUpdateUser(userData);
             const user = await userService.setHeight(1234574, 180);
 
+            expect(user).toBeDefined();
             expect(user.height).toBe(180);
         });
 
