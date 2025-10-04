@@ -125,11 +125,11 @@ class Database {
                 this.db.run(createWorkoutSessionsTable);
                 this.db.run(createUserMaxWeightsTable);
                 this.db.run(createExercisesTable);
-                
+
                 // Вставляем базовые циклы и упражнения
                 this.insertDefaultCycles();
                 this.insertDefaultExercises();
-                
+
                 resolve();
             });
         });

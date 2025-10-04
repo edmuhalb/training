@@ -9,7 +9,7 @@ describe('DialogService', () => {
     let database;
     let botMock;
 
-    beforeAll(async () => {
+    beforeAll(async() => {
         database = new Database();
         await database.init();
         userService = new UserService(database);
@@ -17,13 +17,13 @@ describe('DialogService', () => {
         botMock = new TelegramBotMock();
     });
 
-    afterAll(async () => {
+    afterAll(async() => {
         if (database) {
             database.close();
         }
     });
 
-    beforeEach(async () => {
+    beforeEach(async() => {
         botMock.clearMessages();
         // Очищаем тестовые данные
         await database.run('DELETE FROM users WHERE id > 1000000');
@@ -32,7 +32,7 @@ describe('DialogService', () => {
     });
 
     describe('startProfileDialog', () => {
-        test('should start profile dialog for new user', async () => {
+        test('should start profile dialog for new user', async() => {
             const chatId = 12345;
             const userId = 999001;
 
@@ -54,7 +54,7 @@ describe('DialogService', () => {
             expect(message.options.reply_markup).toBeDefined();
         });
 
-        test('should not start dialog if profile is complete', async () => {
+        test('should not start dialog if profile is complete', async() => {
             const chatId = 12345;
             const userId = 67890;
 
@@ -78,7 +78,7 @@ describe('DialogService', () => {
     });
 
     describe('handleDialogResponse', () => {
-        test('should handle gender selection via callback', async () => {
+        test('should handle gender selection via callback', async() => {
             const userId = 999002;
             const chatId = 12345;
 
@@ -111,7 +111,7 @@ describe('DialogService', () => {
             expect(message.text).toContain('вес в килограммах');
         });
 
-        test('should handle weight input', async () => {
+        test('should handle weight input', async() => {
             const userId = 67890;
             const chatId = 12345;
 
@@ -136,7 +136,7 @@ describe('DialogService', () => {
             expect(response.text).toContain('рост в сантиметрах');
         });
 
-        test('should handle height input', async () => {
+        test('should handle height input', async() => {
             const userId = 67890;
             const chatId = 12345;
 
@@ -161,7 +161,7 @@ describe('DialogService', () => {
             expect(response.text).toContain('уровень подготовки');
         });
 
-        test('should handle level selection and complete dialog', async () => {
+        test('should handle level selection and complete dialog', async() => {
             const userId = 67890;
             const chatId = 12345;
 
@@ -187,7 +187,7 @@ describe('DialogService', () => {
             expect(response.text).toContain('ИМТ');
         });
 
-        test('should validate weight input', async () => {
+        test('should validate weight input', async() => {
             const userId = 999003;
             const chatId = 12345;
 
@@ -217,7 +217,7 @@ describe('DialogService', () => {
             expect(response.text).toContain('Введите вес числом');
         });
 
-        test('should validate height input', async () => {
+        test('should validate height input', async() => {
             const userId = 999004;
             const chatId = 12345;
 

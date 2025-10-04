@@ -5,7 +5,7 @@ class UserService {
 
     async createOrUpdateUser(userData) {
         const { id, username, firstName, lastName, gender, weight, height, level } = userData;
-        
+
         try {
             // Проверяем, существует ли пользователь
             const existingUser = await this.db.get(
@@ -51,25 +51,25 @@ class UserService {
         try {
             const fields = [];
             const values = [];
-            
+
             Object.keys(updateData).forEach(key => {
                 if (updateData[key] !== undefined && updateData[key] !== null) {
                     fields.push(`${key} = ?`);
                     values.push(updateData[key]);
                 }
             });
-            
+
             if (fields.length === 0) {
                 throw new Error('Нет данных для обновления');
             }
-            
+
             values.push(userId);
-            
+
             await this.db.run(
                 `UPDATE users SET ${fields.join(', ')}, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
                 values
             );
-            
+
             return await this.getUser(userId);
         } catch (error) {
             console.error('Ошибка при обновлении пользователя:', error);
@@ -107,11 +107,11 @@ class UserService {
             'МСМК',
             'Средний уровень'
         ];
-        
+
         if (!validLevels.includes(level)) {
             throw new Error('Неверный уровень подготовки');
         }
-        
+
         return await this.updateUser(userId, { level });
     }
 
@@ -121,7 +121,7 @@ class UserService {
             if (!user) {
                 throw new Error('Пользователь не найден');
             }
-            
+
             return {
                 id: user.id,
                 username: user.username,
@@ -164,7 +164,7 @@ class UserService {
                     COUNT(CASE WHEN gender IS NOT NULL AND weight IS NOT NULL AND height IS NOT NULL AND level IS NOT NULL THEN 1 END) as complete_profiles
                 FROM users
             `);
-            
+
             return stats[0];
         } catch (error) {
             console.error('Ошибка при получении статистики пользователей:', error);
@@ -174,19 +174,19 @@ class UserService {
 
     validateUserData(userData) {
         const errors = [];
-        
+
         if (userData.gender && !['male', 'female'].includes(userData.gender)) {
             errors.push('Пол должен быть "male" или "female"');
         }
-        
+
         if (userData.weight && (isNaN(userData.weight) || userData.weight <= 0)) {
             errors.push('Вес должен быть положительным числом');
         }
-        
+
         if (userData.height && (isNaN(userData.height) || userData.height <= 0)) {
             errors.push('Рост должен быть положительным числом');
         }
-        
+
         if (userData.level) {
             const validLevels = [
                 'Начальный',
@@ -197,12 +197,12 @@ class UserService {
                 'МСМК',
                 'Средний уровень'
             ];
-            
+
             if (!validLevels.includes(userData.level)) {
                 errors.push('Неверный уровень подготовки');
             }
         }
-        
+
         return errors;
     }
 
@@ -214,7 +214,7 @@ class UserService {
 
     getBMICategory(bmi) {
         if (!bmi) return null;
-        
+
         if (bmi < 18.5) return 'Недостаточный вес';
         if (bmi < 25) return 'Нормальный вес';
         if (bmi < 30) return 'Избыточный вес';
@@ -223,6 +223,4 @@ class UserService {
 }
 
 module.exports = UserService;
-
-
 

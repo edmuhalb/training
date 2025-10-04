@@ -13,10 +13,10 @@ class WebAppBot {
         if (!TelegramBot) {
             throw new Error('node-telegram-bot-api is required for bot functionality. Install with: npm install node-telegram-bot-api');
         }
-        
+
         this.bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
         this.webAppUrl = process.env.WEBAPP_URL || 'https://your-domain.com';
-        
+
         this.setupHandlers();
     }
 
@@ -98,10 +98,10 @@ class WebAppBot {
             if (msg.web_app_data) {
                 const chatId = msg.chat.id;
                 const data = JSON.parse(msg.web_app_data.data);
-                
+
                 // Handle web app data if needed
                 console.log('Received web app data:', data);
-                
+
                 this.bot.sendMessage(chatId, '✅ Данные получены! Спасибо за использование приложения.');
             }
         });
@@ -132,7 +132,7 @@ class WebAppBot {
 if (require.main === module) {
     const bot = new WebAppBot();
     bot.start();
-    
+
     // Graceful shutdown
     process.on('SIGINT', () => {
         console.log('\nShutting down bot...');

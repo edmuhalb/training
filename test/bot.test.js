@@ -1,4 +1,4 @@
-const TrainingBot = require('../src/bot');
+// const TrainingBot = require('../src/bot');
 const Database = require('../src/database');
 const CycleService = require('../src/services/cycleService');
 const UserService = require('../src/services/userService');
@@ -10,38 +10,38 @@ describe('Training Bot Tests', () => {
     let userService;
     let workoutService;
 
-    beforeAll(async () => {
+    beforeAll(async() => {
         // Инициализация тестовой базы данных
         database = new Database();
         await database.init();
-        
+
         cycleService = new CycleService();
         userService = new UserService(database);
         workoutService = new WorkoutService(database);
     });
 
-    afterAll(async () => {
+    afterAll(async() => {
         if (database) {
             database.close();
         }
     });
 
     describe('CycleService', () => {
-        test('should return available cycles', async () => {
+        test('should return available cycles', async() => {
             const cycles = await cycleService.getAvailableCycles();
             expect(cycles).toBeDefined();
             expect(Array.isArray(cycles)).toBe(true);
             expect(cycles.length).toBeGreaterThan(0);
         });
 
-        test('should return cycle by id', async () => {
+        test('should return cycle by id', async() => {
             const cycle = await cycleService.getCycleById(1);
             expect(cycle).toBeDefined();
             expect(cycle.id).toBe(1);
             expect(cycle.name).toBe('СРЦ1');
         });
 
-        test('should filter cycles by criteria', async () => {
+        test('should filter cycles by criteria', async() => {
             const criteria = {
                 gender: 'male',
                 level: 'II разряд'
@@ -53,7 +53,7 @@ describe('Training Bot Tests', () => {
     });
 
     describe('UserService', () => {
-        test('should create user', async () => {
+        test('should create user', async() => {
             const userData = {
                 id: 12345,
                 username: 'testuser',
@@ -66,7 +66,7 @@ describe('Training Bot Tests', () => {
             expect(user.id).toBe(12345);
         });
 
-        test('should update user weight', async () => {
+        test('should update user weight', async() => {
             const userId = 12345;
             const weight = 75.5;
 
@@ -101,7 +101,7 @@ describe('Training Bot Tests', () => {
     });
 
     describe('WorkoutService', () => {
-        test('should generate workout plan', async () => {
+        test('should generate workout plan', async() => {
             const cycle = await cycleService.getCycleById(1);
             const userProfile = {
                 id: 12345,
@@ -148,13 +148,11 @@ describe('Training Bot Tests', () => {
             expect(database.db).toBeDefined();
         });
 
-        test('should execute queries', async () => {
+        test('should execute queries', async() => {
             const result = await database.query('SELECT COUNT(*) as count FROM users');
             expect(result).toBeDefined();
             expect(result[0].count).toBeDefined();
         });
     });
 });
-
-
 

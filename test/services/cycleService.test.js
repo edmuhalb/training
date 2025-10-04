@@ -8,14 +8,14 @@ describe('CycleService', () => {
     });
 
     describe('getAvailableCycles', () => {
-        test('should return array of cycles', async () => {
+        test('should return array of cycles', async() => {
             const cycles = await cycleService.getAvailableCycles();
-            
+
             expect(Array.isArray(cycles)).toBe(true);
             expect(cycles.length).toBeGreaterThan(0);
-            
+
             // Проверяем структуру цикла
-            const cycle = cycles[0];
+            const [cycle] = cycles;
             expect(cycle).toHaveProperty('id');
             expect(cycle).toHaveProperty('name');
             expect(cycle).toHaveProperty('direction');
@@ -23,9 +23,9 @@ describe('CycleService', () => {
             expect(cycle).toHaveProperty('period');
         });
 
-        test('should return cycles with correct structure', async () => {
+        test('should return cycles with correct structure', async() => {
             const cycles = await cycleService.getAvailableCycles();
-            
+
             cycles.forEach(cycle => {
                 expect(typeof cycle.id).toBe('number');
                 expect(typeof cycle.name).toBe('string');
@@ -37,56 +37,56 @@ describe('CycleService', () => {
     });
 
     describe('getCycleById', () => {
-        test('should return cycle by valid id', async () => {
+        test('should return cycle by valid id', async() => {
             const cycle = await cycleService.getCycleById(1);
-            
+
             expect(cycle).toBeDefined();
             expect(cycle.id).toBe(1);
             expect(cycle.name).toBe('СРЦ1');
             expect(cycle.direction).toBe('Троеборье');
         });
 
-        test('should return undefined for invalid id', async () => {
+        test('should return undefined for invalid id', async() => {
             const cycle = await cycleService.getCycleById(999);
             expect(cycle).toBeUndefined();
         });
     });
 
     describe('getCyclesByCriteria', () => {
-        test('should filter cycles by gender', async () => {
+        test('should filter cycles by gender', async() => {
             const criteria = { gender: 'male' };
             const cycles = await cycleService.getCyclesByCriteria(criteria);
-            
+
             expect(cycles.length).toBeGreaterThan(0);
             cycles.forEach(cycle => {
                 expect(cycle.gender).toBe('male');
             });
         });
 
-        test('should filter cycles by level', async () => {
+        test('should filter cycles by level', async() => {
             const criteria = { level: 'КМС' };
             const cycles = await cycleService.getCyclesByCriteria(criteria);
-            
+
             expect(cycles.length).toBeGreaterThan(0);
             cycles.forEach(cycle => {
                 expect(cycle.level).toContain('КМС');
             });
         });
 
-        test('should filter cycles by direction', async () => {
+        test('should filter cycles by direction', async() => {
             const criteria = { direction: 'Жим лежа' };
             const cycles = await cycleService.getCyclesByCriteria(criteria);
-            
+
             expect(cycles.length).toBeGreaterThan(0);
             cycles.forEach(cycle => {
                 expect(cycle.direction).toBe('Жим лежа');
             });
         });
 
-        test('should filter cycles by weight', async () => {
+        test('should filter cycles by weight', async() => {
             const criteria = { weight: 85 };
             const cycles = await cycleService.getCyclesByCriteria(criteria);
-            
+
             expect(cycles.length).toBeGreaterThan(0);
             cycles.forEach(cycle => {
                 if (cycle.weightMin) {
@@ -95,10 +95,10 @@ describe('CycleService', () => {
             });
         });
 
-        test('should return empty array for no matches', async () => {
+        test('should return empty array for no matches', async() => {
             const criteria = { gender: 'female' };
             const cycles = await cycleService.getCyclesByCriteria(criteria);
-            
+
             expect(cycles.length).toBe(0);
         });
     });
@@ -115,7 +115,7 @@ describe('CycleService', () => {
             };
 
             const description = cycleService.getCycleDescription(cycle);
-            
+
             expect(description).toContain('СРЦ1');
             expect(description).toContain('Троеборье');
             expect(description).toContain('II разряд – КМС');
@@ -147,7 +147,7 @@ describe('CycleService', () => {
             };
 
             const plan = cycleService.getWorkoutPlan(cycle, userProfile);
-            
+
             expect(plan).toHaveProperty('name', 'СРЦ1');
             expect(plan).toHaveProperty('direction', 'Троеборье');
             expect(plan).toHaveProperty('level', 'II разряд – КМС');
@@ -203,7 +203,7 @@ describe('CycleService', () => {
             };
 
             const notes = cycleService.getCycleNotes(cycle, userProfile);
-            
+
             expect(Array.isArray(notes)).toBe(true);
             expect(notes.length).toBeGreaterThan(0);
             expect(notes).toContain('Тестовая информация');
@@ -215,7 +215,7 @@ describe('CycleService', () => {
             const userProfile = { weight: 65, height: 180 };
 
             const notes = cycleService.getCycleNotes(cycle, userProfile);
-            
+
             expect(notes).toContain('⚠️ Рекомендуется набрать вес до 80 кг для оптимальных результатов');
         });
 
@@ -224,7 +224,7 @@ describe('CycleService', () => {
             const userProfile = { level: 'МС' };
 
             const notes = cycleService.getCycleNotes(cycle, userProfile);
-            
+
             expect(notes).toContain('🏆 Период подготовки к соревнованиям - максимальная интенсивность');
         });
     });

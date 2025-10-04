@@ -13,7 +13,7 @@ class WebApp {
         this.cycleService = new CycleService(this.database);
         this.workoutService = new WorkoutService(this.database);
         this.maxWeightService = new (require('./services/maxWeightService'))(this.database);
-        
+
         this.setupMiddleware();
         this.setupRoutes();
     }
@@ -21,21 +21,21 @@ class WebApp {
     setupMiddleware() {
         // Parse JSON bodies
         this.app.use(express.json());
-        
+
         // Serve static files
         this.app.use(express.static(path.join(__dirname, '../public')));
-        
+
         // Serve index.html for root path
         this.app.get('/', (req, res) => {
             res.sendFile(path.join(__dirname, '../public/index.html'));
         });
-        
+
         // CORS for Telegram WebApp
         this.app.use((req, res, next) => {
             res.header('Access-Control-Allow-Origin', '*');
             res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
             res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-            
+
             if (req.method === 'OPTIONS') {
                 res.sendStatus(200);
             } else {
@@ -61,7 +61,7 @@ class WebApp {
         this.app.get('/api/cycles', this.getCycles.bind(this));
         this.app.post('/api/workout-plan', this.generateWorkoutPlan.bind(this));
         this.app.get('/api/workout-plans', this.getWorkoutPlans.bind(this));
-        
+
         // Max Weight API
         this.app.get('/api/max-weights', this.getMaxWeights.bind(this));
         this.app.post('/api/max-weights', this.saveMaxWeight.bind(this));
@@ -75,7 +75,7 @@ class WebApp {
             // In a real app, you'd get this from Telegram WebApp data
             const userId = 1;
             const user = await this.userService.getUser(userId);
-            
+
             if (user) {
                 res.json(user);
             } else {
@@ -91,23 +91,23 @@ class WebApp {
     async saveProfile(req, res) {
         try {
             const { gender, weight, height, level } = req.body;
-            
+
             // Validate input
             if (!gender || !weight || !height || !level) {
                 return res.status(400).json({ message: 'All fields are required' });
             }
-            
+
             if (weight < 30 || weight > 200) {
                 return res.status(400).json({ message: 'Weight must be between 30 and 200 kg' });
             }
-            
+
             if (height < 120 || height > 250) {
                 return res.status(400).json({ message: 'Height must be between 120 and 250 cm' });
             }
-            
+
             // For demo purposes, we'll use a default user ID
             const userId = 1;
-            
+
             // Create or update user
             const userData = {
                 id: userId,
@@ -119,7 +119,7 @@ class WebApp {
                 height,
                 level
             };
-            
+
             const user = await this.userService.createOrUpdateUser(userData);
             res.json(user);
         } catch (error) {
@@ -144,11 +144,11 @@ class WebApp {
         try {
             const { cycleId, userId } = req.body;
             console.log('Generating workout plan for cycleId:', cycleId, 'userId:', userId);
-            
+
             if (!cycleId || !userId) {
                 return res.status(400).json({ message: 'Cycle ID and User ID are required' });
             }
-            
+
             // Get user profile
             console.log('Getting user profile...');
             const userProfile = await this.userService.getUser(userId);
@@ -157,18 +157,18 @@ class WebApp {
                 return res.status(404).json({ message: 'User not found' });
             }
             console.log('User profile found:', userProfile);
-            
+
             // Get cycle
             console.log('Getting cycles...');
             const cycles = await this.cycleService.getCycles();
             console.log('Found cycles:', cycles.length);
-            const cycle = cycles.find(c => c.id == cycleId);
+            const cycle = cycles.find(c => c.id === cycleId);
             if (!cycle) {
                 console.log('Cycle not found');
                 return res.status(404).json({ message: 'Cycle not found' });
             }
             console.log('Cycle found:', cycle.name);
-            
+
             console.log('Generating workout plan...');
             const workoutPlan = await this.workoutService.generateWorkoutPlan(cycle, userProfile);
             console.log('Workout plan generated successfully');
@@ -197,11 +197,11 @@ class WebApp {
             // Initialize database
             await this.database.init();
             console.log('Database initialized');
-            
+
             // Initialize default data
             await this.initializeDefaultData();
             console.log('Default data initialized');
-            
+
             // Start server
             this.app.listen(port, () => {
                 console.log(`WebApp server running on port ${port}`);
@@ -293,11 +293,11 @@ class WebApp {
     async saveMaxWeight(req, res) {
         try {
             const { userId, exerciseName, maxWeight } = req.body;
-            
+
             if (!userId || !exerciseName || !maxWeight) {
                 return res.status(400).json({ message: 'User ID, exercise name and max weight are required' });
             }
-            
+
             const result = await this.maxWeightService.saveMaxWeight(userId, exerciseName, maxWeight);
             res.json(result);
         } catch (error) {
@@ -310,11 +310,11 @@ class WebApp {
     async updateMaxWeight(req, res) {
         try {
             const { userId, exerciseName, maxWeight } = req.body;
-            
+
             if (!userId || !exerciseName || !maxWeight) {
                 return res.status(400).json({ message: 'User ID, exercise name and max weight are required' });
             }
-            
+
             const result = await this.maxWeightService.saveMaxWeight(userId, exerciseName, maxWeight);
             res.json(result);
         } catch (error) {

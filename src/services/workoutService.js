@@ -37,10 +37,10 @@ class WorkoutService {
             console.log('No exercises found in cycle, using default exercises');
             return this.getDefaultExercises();
         }
-        
+
         const exercises = cycle.exercises.map(exercise => {
             const adjustedExercise = { ...exercise };
-            
+
             // Корректируем интенсивность в зависимости от уровня пользователя
             if (userProfile.level === 'Начальный') {
                 adjustedExercise.intensity = this.adjustIntensityForBeginner(exercise.intensity);
@@ -48,12 +48,12 @@ class WorkoutService {
             } else if (userProfile.level === 'МС' || userProfile.level === 'МСМК') {
                 adjustedExercise.intensity = this.adjustIntensityForAdvanced(exercise.intensity);
             }
-            
+
             // Корректируем в зависимости от веса пользователя
             if (userProfile.weight && userProfile.weight < 70) {
                 adjustedExercise.reps = this.increaseRepsForLightWeight(exercise.reps);
             }
-            
+
             return adjustedExercise;
         });
 
@@ -62,7 +62,7 @@ class WorkoutService {
 
     calculateWeightFromIntensity(maxWeight, intensity) {
         if (!maxWeight || !intensity) return null;
-        
+
         // Извлекаем процент из строки типа "80-90%"
         const percentageMatch = intensity.match(/(\d+)-(\d+)%/);
         if (percentageMatch) {
@@ -71,14 +71,14 @@ class WorkoutService {
             const avgPercent = (minPercent + maxPercent) / 2;
             return this.maxWeightService.calculateWeightFromMax(maxWeight, avgPercent);
         }
-        
+
         // Если формат другой, пробуем извлечь число
         const singleMatch = intensity.match(/(\d+)%/);
         if (singleMatch) {
             const percent = parseInt(singleMatch[1]);
             return this.maxWeightService.calculateWeightFromMax(maxWeight, percent);
         }
-        
+
         return null;
     }
 
@@ -126,10 +126,10 @@ class WorkoutService {
         const sessions = [];
         const totalWeeks = this.parseDuration(plan.duration);
         const frequency = this.parseFrequency(plan.frequency);
-        
+
         // Определяем типы тренировок в зависимости от направления
         const sessionTypes = this.getSessionTypes(plan.direction);
-        
+
         for (let week = 1; week <= totalWeeks; week++) {
             for (let day = 1; day <= frequency; day++) {
                 const sessionType = sessionTypes[(day - 1) % sessionTypes.length];
@@ -137,7 +137,7 @@ class WorkoutService {
                 sessions.push(session);
             }
         }
-        
+
         return sessions;
     }
 
@@ -161,30 +161,30 @@ class WorkoutService {
 
     getSessionTypes(direction) {
         switch (direction) {
-            case 'Троеборье':
-                return ['Силовая', 'Техническая', 'Восстановительная'];
-            case 'Двоеборье':
-                return ['Силовая', 'Техническая'];
-            case 'Жим лежа':
-                return ['Жимовая', 'Вспомогательная'];
-            default:
-                return ['Силовая', 'Общая'];
+        case 'Троеборье':
+            return ['Силовая', 'Техническая', 'Восстановительная'];
+        case 'Двоеборье':
+            return ['Силовая', 'Техническая'];
+        case 'Жим лежа':
+            return ['Жимовая', 'Вспомогательная'];
+        default:
+            return ['Силовая', 'Общая'];
         }
     }
 
     createWorkoutSession(plan, week, day, sessionType, userProfile) {
         const sessionName = `${sessionType} тренировка (Неделя ${week}, День ${day})`;
-        
+
         // Выбираем упражнения для типа тренировки
         const sessionExercises = this.selectExercisesForSession(plan.exercises, sessionType, week);
-        
+
         // Адаптируем под неделю (прогрессия)
         const adaptedExercises = this.adaptExercisesForWeek(sessionExercises, week, userProfile);
-        
+
         return {
             weekNumber: week,
             dayNumber: day,
-            sessionName: sessionName,
+            sessionName,
             exercises: adaptedExercises,
             notes: this.generateSessionNotes(sessionType, week, userProfile)
         };
@@ -192,35 +192,35 @@ class WorkoutService {
 
     selectExercisesForSession(exercises, sessionType, week) {
         switch (sessionType) {
-            case 'Силовая':
-                return exercises.filter(ex => 
-                    ex.name.includes('Приседания') || 
-                    ex.name.includes('Жим лежа') || 
+        case 'Силовая':
+            return exercises.filter(ex =>
+                ex.name.includes('Приседания') ||
+                    ex.name.includes('Жим лежа') ||
                     ex.name.includes('Становая тяга')
-                );
-            case 'Техническая':
-                return exercises.filter(ex => 
-                    ex.name.includes('Жим стоя') || 
+            );
+        case 'Техническая':
+            return exercises.filter(ex =>
+                ex.name.includes('Жим стоя') ||
                     ex.name.includes('Подтягивания')
-                );
-            case 'Восстановительная':
-                return exercises.slice(0, 2); // Меньше упражнений
-            case 'Жимовая':
-                return exercises.filter(ex => ex.name.includes('Жим'));
-            case 'Вспомогательная':
-                return exercises.filter(ex => 
-                    !ex.name.includes('Приседания') && 
+            );
+        case 'Восстановительная':
+            return exercises.slice(0, 2); // Меньше упражнений
+        case 'Жимовая':
+            return exercises.filter(ex => ex.name.includes('Жим'));
+        case 'Вспомогательная':
+            return exercises.filter(ex =>
+                !ex.name.includes('Приседания') &&
                     !ex.name.includes('Становая тяга')
-                );
-            default:
-                return exercises;
+            );
+        default:
+            return exercises;
         }
     }
 
     adaptExercisesForWeek(exercises, week, userProfile) {
         return exercises.map(exercise => {
             const adapted = { ...exercise };
-            
+
             // Прогрессия по неделям
             if (week <= 2) {
                 // Первые 2 недели - адаптация
@@ -231,7 +231,7 @@ class WorkoutService {
                 adapted.sets = exercise.sets + 1;
                 adapted.intensity = this.increaseIntensity(exercise.intensity, 5);
             }
-            
+
             return adapted;
         });
     }
@@ -256,7 +256,7 @@ class WorkoutService {
 
     generateSessionNotes(sessionType, week, userProfile) {
         const notes = [];
-        
+
         if (sessionType === 'Силовая') {
             notes.push('💪 Фокус на максимальных весах и технике');
             if (week >= 6) {
@@ -269,11 +269,11 @@ class WorkoutService {
             notes.push('🔄 Легкая тренировка для восстановления');
             notes.push('💤 Следите за качеством сна');
         }
-        
+
         if (userProfile.level === 'Начальный') {
             notes.push('⚠️ Начинайте с разминки 10-15 минут');
         }
-        
+
         return notes;
     }
 
@@ -313,12 +313,12 @@ class WorkoutService {
 
     generateNotes(cycle, userProfile) {
         const notes = [];
-        
+
         // Базовые заметки цикла
         if (cycle.additionalInfo) {
             notes.push(cycle.additionalInfo);
         }
-        
+
         // Персональные рекомендации
         if (userProfile.weight && userProfile.height) {
             const bmi = this.calculateBMI(userProfile.weight, userProfile.height);
@@ -328,7 +328,7 @@ class WorkoutService {
                 notes.push('💡 Рекомендуется сочетать силовые тренировки с кардио');
             }
         }
-        
+
         if (userProfile.level === 'Начальный') {
             notes.push('🎯 Фокус на технике выполнения упражнений');
             notes.push('⏰ Увеличьте время отдыха между подходами до 2-3 минут');
@@ -336,17 +336,17 @@ class WorkoutService {
             notes.push('🏆 Период подготовки к соревнованиям - максимальная концентрация');
             notes.push('📊 Ведите детальный дневник тренировок');
         }
-        
+
         if (cycle.period === 'Массонабор') {
             notes.push('🍽️ Питание: 1.6-2.2г белка на кг веса');
             notes.push('😴 Сон: минимум 8 часов в сутки');
         }
-        
+
         if (cycle.period === 'Выносливость') {
             notes.push('💪 Фокус на объеме тренировок');
             notes.push('⏱️ Короткие перерывы между подходами (60-90 сек)');
         }
-        
+
         return notes;
     }
 
@@ -357,31 +357,31 @@ class WorkoutService {
 
     getCycleDuration(cycle) {
         switch (cycle.period) {
-            case 'Силовой':
-                return '8-12 недель';
-            case 'Выносливость':
-                return '6-10 недель';
-            case 'Выход на пик':
-                return '4-6 недель';
-            case 'Массонабор':
-                return '12-16 недель';
-            default:
-                return '8-12 недель';
+        case 'Силовой':
+            return '8-12 недель';
+        case 'Выносливость':
+            return '6-10 недель';
+        case 'Выход на пик':
+            return '4-6 недель';
+        case 'Массонабор':
+            return '12-16 недель';
+        default:
+            return '8-12 недель';
         }
     }
 
     getTrainingFrequency(cycle) {
         switch (cycle.direction) {
-            case 'Троеборье':
-                return '3-4 раза в неделю';
-            case 'Жим лежа':
-                return '2-3 раза в неделю';
-            case 'Армрестлинг':
-                return '3-4 раза в неделю';
-            case 'Бодибилдинг':
-                return '4-6 раз в неделю';
-            default:
-                return '3-4 раза в неделю';
+        case 'Троеборье':
+            return '3-4 раза в неделю';
+        case 'Жим лежа':
+            return '2-3 раза в неделю';
+        case 'Армрестлинг':
+            return '3-4 раза в неделю';
+        case 'Бодибилдинг':
+            return '4-6 раз в неделю';
+        default:
+            return '3-4 раза в неделю';
         }
     }
 
@@ -392,19 +392,19 @@ class WorkoutService {
                 (user_id, cycle_id, name, direction, level, period, duration, frequency, exercises, notes) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                 [
-                    plan.userId, 
-                    plan.cycleId, 
-                    plan.name, 
-                    plan.direction, 
-                    plan.level, 
-                    plan.period, 
-                    plan.duration, 
-                    plan.frequency, 
-                    JSON.stringify(plan.exercises), 
+                    plan.userId,
+                    plan.cycleId,
+                    plan.name,
+                    plan.direction,
+                    plan.level,
+                    plan.period,
+                    plan.duration,
+                    plan.frequency,
+                    JSON.stringify(plan.exercises),
                     JSON.stringify(plan.notes)
                 ]
             );
-            
+
             return {
                 id: result.lastID,
                 ...plan
@@ -490,11 +490,11 @@ class WorkoutService {
                 'SELECT * FROM workout_plans WHERE id = ?',
                 [planId]
             );
-            
+
             if (!plan) {
                 throw new Error('План тренировок не найден');
             }
-            
+
             return {
                 id: plan.id,
                 ...JSON.parse(plan.plan_data),
@@ -507,12 +507,13 @@ class WorkoutService {
     }
 
     formatWorkoutPlan(plan) {
-        const exercisesText = plan.exercises.map((exercise, index) => 
+        const exercisesText = plan.exercises.map((exercise, index) =>
             `${index + 1}. ${exercise.name}\n   • Подходы: ${exercise.sets}\n   • Повторения: ${exercise.reps}\n   • Интенсивность: ${exercise.intensity}`
         ).join('\n\n');
 
-        const notesText = plan.notes.length > 0 ? 
-            `\n\n📝 Рекомендации:\n${plan.notes.map(note => `• ${note}`).join('\n')}` : '';
+        const notesText = plan.notes.length > 0
+            ? `\n\n📝 Рекомендации:\n${plan.notes.map(note => `• ${note}`).join('\n')}`
+            : '';
 
         return `
 🏋️‍♂️ План тренировок: ${plan.name}
@@ -533,11 +534,11 @@ ${exercisesText}${notesText}
                 'DELETE FROM workout_plans WHERE id = ? AND user_id = ?',
                 [planId, userId]
             );
-            
+
             if (result.changes === 0) {
                 throw new Error('План тренировок не найден или у вас нет прав на его удаление');
             }
-            
+
             return true;
         } catch (error) {
             console.error('Ошибка при удалении плана тренировок:', error);
@@ -547,6 +548,4 @@ ${exercisesText}${notesText}
 }
 
 module.exports = WorkoutService;
-
-
 

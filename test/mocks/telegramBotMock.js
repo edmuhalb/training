@@ -80,5 +80,3 @@ class TelegramBotMock {
 
 module.exports = TelegramBotMock;
 
-
-

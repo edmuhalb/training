@@ -95,18 +95,18 @@ class MaxWeightService {
     // Рассчитать вес на основе ПМ и процента
     calculateWeightFromMax(maxWeight, percentage) {
         if (!maxWeight || !percentage) return 0;
-        
+
         // Убираем символ % если есть
         const cleanPercentage = percentage.toString().replace('%', '');
         const percent = parseFloat(cleanPercentage) / 100;
-        
+
         return Math.round(maxWeight * percent * 10) / 10; // Округляем до 0.1 кг
     }
 
     // Рассчитать ПМ на основе веса и повторений (формула Эпли)
     calculateMaxFromWeightAndReps(weight, reps) {
         if (!weight || !reps || reps <= 0) return 0;
-        
+
         // Формула Эпли: ПМ = вес * (1 + reps/30)
         const maxWeight = weight * (1 + reps / 30);
         return Math.round(maxWeight * 10) / 10; // Округляем до 0.1 кг
@@ -115,22 +115,22 @@ class MaxWeightService {
     // Получить рекомендуемые проценты для упражнения
     getRecommendedPercentages(exerciseName, level) {
         const basePercentages = {
-            'Приседания': [85, 80, 75, 70],
+            Приседания: [85, 80, 75, 70],
             'Жим лежа': [85, 80, 75, 70],
             'Становая тяга': [85, 80, 75, 70],
             'Жим стоя': [80, 75, 70, 65],
-            'Подтягивания': [100, 90, 80, 70] // Для подтягиваний проценты от собственного веса
+            Подтягивания: [100, 90, 80, 70] // Для подтягиваний проценты от собственного веса
         };
 
         const percentages = basePercentages[exerciseName] || [80, 75, 70, 65];
-        
+
         // Корректируем в зависимости от уровня
         if (level === 'Начальный') {
             return percentages.map(p => Math.max(60, p - 10));
         } else if (level === 'МС' || level === 'МСМК') {
             return percentages.map(p => Math.min(95, p + 5));
         }
-        
+
         return percentages;
     }
 }

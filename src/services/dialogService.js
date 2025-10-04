@@ -18,10 +18,10 @@ class DialogService {
         try {
             // Проверяем текущий профиль пользователя
             const user = await this.userService.getUser(userId);
-            
+
             if (user && user.gender && user.weight && user.height && user.level) {
                 // Профиль уже заполнен
-                await bot.sendMessage(chatId, 
+                await bot.sendMessage(chatId,
                     '✅ Ваш профиль уже заполнен!\n\n' +
                     'Используйте /profile для просмотра или изменения данных.');
                 return;
@@ -52,19 +52,19 @@ class DialogService {
             }
         };
 
-        await bot.sendMessage(chatId, 
+        await bot.sendMessage(chatId,
             '👤 Давайте заполним ваш профиль!\n\n' +
             '**Шаг 1 из 4:** Выберите ваш пол:', keyboard);
     }
 
     async askWeight(bot, chatId) {
-        await bot.sendMessage(chatId, 
+        await bot.sendMessage(chatId,
             '⚖️ **Шаг 2 из 4:** Введите ваш вес в килограммах\n\n' +
             'Например: 75 или 75.5');
     }
 
     async askHeight(bot, chatId) {
-        await bot.sendMessage(chatId, 
+        await bot.sendMessage(chatId,
             '📏 **Шаг 3 из 4:** Введите ваш рост в сантиметрах\n\n' +
             'Например: 180');
     }
@@ -84,14 +84,14 @@ class DialogService {
             }
         };
 
-        await bot.sendMessage(chatId, 
+        await bot.sendMessage(chatId,
             '🏆 **Шаг 4 из 4:** Выберите ваш уровень подготовки:', keyboard);
     }
 
     async handleDialogResponse(bot, msg, callbackData = null) {
         const chatId = msg.chat.id;
         const userId = msg.from.id;
-        const text = msg.text;
+        const { text } = msg;
 
         try {
             const userState = this.userStates.get(userId);
@@ -100,73 +100,73 @@ class DialogService {
             }
 
             switch (userState.state) {
-                case DialogService.DIALOG_STATES.WAITING_GENDER:
-                    if (callbackData && callbackData.startsWith('dialog_gender_')) {
-                        const gender = callbackData.replace('dialog_gender_', '');
-                        await this.userService.setGender(userId, gender);
-                        userState.data.gender = gender;
-                        userState.state = DialogService.DIALOG_STATES.WAITING_WEIGHT;
-                        await this.askWeight(bot, chatId);
-                        return true;
-                    }
-                    break;
+            case DialogService.DIALOG_STATES.WAITING_GENDER:
+                if (callbackData && callbackData.startsWith('dialog_gender_')) {
+                    const gender = callbackData.replace('dialog_gender_', '');
+                    await this.userService.setGender(userId, gender);
+                    userState.data.gender = gender;
+                    userState.state = DialogService.DIALOG_STATES.WAITING_WEIGHT;
+                    await this.askWeight(bot, chatId);
+                    return true;
+                }
+                break;
 
-                case DialogService.DIALOG_STATES.WAITING_WEIGHT:
-                    if (text && !isNaN(parseFloat(text))) {
-                        const weight = parseFloat(text);
-                        if (weight > 0 && weight < 500) {
-                            await this.userService.setWeight(userId, weight);
-                            userState.data.weight = weight;
-                            userState.state = DialogService.DIALOG_STATES.WAITING_HEIGHT;
-                            await this.askHeight(bot, chatId);
-                            return true;
-                        } else {
-                            await bot.sendMessage(chatId, 
-                                '❌ Неверный вес! Введите число от 1 до 500 кг.\n\n' +
+            case DialogService.DIALOG_STATES.WAITING_WEIGHT:
+                if (text && !isNaN(parseFloat(text))) {
+                    const weight = parseFloat(text);
+                    if (weight > 0 && weight < 500) {
+                        await this.userService.setWeight(userId, weight);
+                        userState.data.weight = weight;
+                        userState.state = DialogService.DIALOG_STATES.WAITING_HEIGHT;
+                        await this.askHeight(bot, chatId);
+                        return true;
+                    } else {
+                        await bot.sendMessage(chatId,
+                            '❌ Неверный вес! Введите число от 1 до 500 кг.\n\n' +
                                 'Например: 75');
-                        }
-                    } else {
-                        await bot.sendMessage(chatId, 
-                            '❌ Введите вес числом!\n\n' +
+                    }
+                } else {
+                    await bot.sendMessage(chatId,
+                        '❌ Введите вес числом!\n\n' +
                             'Например: 75 или 75.5');
-                        return true;
-                    }
-                    break;
+                    return true;
+                }
+                break;
 
-                case DialogService.DIALOG_STATES.WAITING_HEIGHT:
-                    if (text && !isNaN(parseFloat(text))) {
-                        const height = parseFloat(text);
-                        if (height > 0 && height < 300) {
-                            await this.userService.setHeight(userId, height);
-                            userState.data.height = height;
-                            userState.state = DialogService.DIALOG_STATES.WAITING_LEVEL;
-                            await this.askLevel(bot, chatId);
-                            return true;
-                        } else {
-                            await bot.sendMessage(chatId, 
-                                '❌ Неверный рост! Введите число от 1 до 300 см.\n\n' +
-                                'Например: 180');
-                        }
+            case DialogService.DIALOG_STATES.WAITING_HEIGHT:
+                if (text && !isNaN(parseFloat(text))) {
+                    const height = parseFloat(text);
+                    if (height > 0 && height < 300) {
+                        await this.userService.setHeight(userId, height);
+                        userState.data.height = height;
+                        userState.state = DialogService.DIALOG_STATES.WAITING_LEVEL;
+                        await this.askLevel(bot, chatId);
+                        return true;
                     } else {
-                        await bot.sendMessage(chatId, 
-                            '❌ Введите рост числом!\n\n' +
+                        await bot.sendMessage(chatId,
+                            '❌ Неверный рост! Введите число от 1 до 300 см.\n\n' +
+                                'Например: 180');
+                    }
+                } else {
+                    await bot.sendMessage(chatId,
+                        '❌ Введите рост числом!\n\n' +
                             'Например: 180');
-                        return true;
-                    }
-                    break;
+                    return true;
+                }
+                break;
 
-                case DialogService.DIALOG_STATES.WAITING_LEVEL:
-                    if (callbackData && callbackData.startsWith('dialog_level_')) {
-                        const level = callbackData.replace('dialog_level_', '');
-                        await this.userService.setLevel(userId, level);
-                        userState.data.level = level;
-                        
-                        // Завершаем диалог
-                        await this.completeProfileDialog(bot, chatId, userId, userState.data);
-                        this.userStates.delete(userId);
-                        return true;
-                    }
-                    break;
+            case DialogService.DIALOG_STATES.WAITING_LEVEL:
+                if (callbackData && callbackData.startsWith('dialog_level_')) {
+                    const level = callbackData.replace('dialog_level_', '');
+                    await this.userService.setLevel(userId, level);
+                    userState.data.level = level;
+
+                    // Завершаем диалог
+                    await this.completeProfileDialog(bot, chatId, userId, userState.data);
+                    this.userStates.delete(userId);
+                    return true;
+                }
+                break;
             }
 
             return false; // Ответ не обработан
@@ -179,7 +179,7 @@ class DialogService {
 
     async completeProfileDialog(bot, chatId, userId, profileData) {
         try {
-            const user = await this.userService.getUser(userId);
+            // const user = await this.userService.getUser(userId);
             const bmi = this.calculateBMI(profileData.weight, profileData.height);
             const bmiCategory = this.getBMICategory(bmi);
 

@@ -1,5 +1,5 @@
 const TrainingBot = require('../../src/bot');
-const TelegramBotMock = require('../mocks/telegramBotMock');
+// const TelegramBotMock = require('../mocks/telegramBotMock');
 const Database = require('../../src/database');
 
 // Мокаем node-telegram-bot-api
@@ -13,15 +13,15 @@ describe('Bot E2E Tests', () => {
     let botMock;
     let database;
 
-    beforeAll(async () => {
+    beforeAll(async() => {
         process.env.DATABASE_URL = './test/data/e2e_test.db';
         process.env.TELEGRAM_BOT_TOKEN = 'test_token';
-        
+
         database = new Database();
         await database.init();
     });
 
-    afterAll(async () => {
+    afterAll(async() => {
         if (database) {
             database.close();
         }
@@ -33,7 +33,7 @@ describe('Bot E2E Tests', () => {
     });
 
     describe('Complete User Journey', () => {
-        test('should complete full user registration and workout plan generation', async () => {
+        test('should complete full user registration and workout plan generation', async() => {
             const userId = 999999;
             const chatId = 888888;
 
@@ -120,7 +120,7 @@ describe('Bot E2E Tests', () => {
     });
 
     describe('Error Handling E2E', () => {
-        test('should handle invalid inputs gracefully', async () => {
+        test('should handle invalid inputs gracefully', async() => {
             const userId = 999998;
             const chatId = 888887;
 
@@ -166,7 +166,7 @@ describe('Bot E2E Tests', () => {
             expect(heightMessage.text).toContain('Введите рост числом');
         });
 
-        test('should handle dialog cancellation', async () => {
+        test('should handle dialog cancellation', async() => {
             const userId = 999997;
             const chatId = 888886;
 
@@ -190,7 +190,7 @@ describe('Bot E2E Tests', () => {
     });
 
     describe('Multiple Users E2E', () => {
-        test('should handle multiple users simultaneously', async () => {
+        test('should handle multiple users simultaneously', async() => {
             const user1 = { id: 999996, chatId: 888885 };
             const user2 = { id: 999995, chatId: 888884 };
 
@@ -233,7 +233,7 @@ describe('Bot E2E Tests', () => {
     });
 
     describe('Performance E2E', () => {
-        test('should handle rapid message processing', async () => {
+        test('should handle rapid message processing', async() => {
             const userId = 999994;
             const chatId = 888883;
 

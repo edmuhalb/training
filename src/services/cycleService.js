@@ -178,7 +178,7 @@ class CycleService {
             if (criteria.direction && cycle.direction !== criteria.direction) return false;
             if (criteria.weight && cycle.weightMin && criteria.weight < cycle.weightMin) return false;
             if (criteria.weight && cycle.weightMax && criteria.weight > cycle.weightMax) return false;
-            
+
             return true;
         });
     }
@@ -210,53 +210,53 @@ ${cycle.additionalInfo ? `ℹ️ Дополнительно: ${cycle.additionalI
 
     getCycleDuration(cycle) {
         switch (cycle.period) {
-            case 'Силовой':
-                return '8-12 недель';
-            case 'Выносливость':
-                return '6-10 недель';
-            case 'Выход на пик':
-                return '4-6 недель';
-            case 'Массонабор':
-                return '12-16 недель';
-            default:
-                return '8-12 недель';
+        case 'Силовой':
+            return '8-12 недель';
+        case 'Выносливость':
+            return '6-10 недель';
+        case 'Выход на пик':
+            return '4-6 недель';
+        case 'Массонабор':
+            return '12-16 недель';
+        default:
+            return '8-12 недель';
         }
     }
 
     getTrainingFrequency(cycle) {
         switch (cycle.direction) {
-            case 'Троеборье':
-                return '3-4 раза в неделю';
-            case 'Жим лежа':
-                return '2-3 раза в неделю';
-            case 'Армрестлинг':
-                return '3-4 раза в неделю';
-            case 'Бодибилдинг':
-                return '4-6 раз в неделю';
-            default:
-                return '3-4 раза в неделю';
+        case 'Троеборье':
+            return '3-4 раза в неделю';
+        case 'Жим лежа':
+            return '2-3 раза в неделю';
+        case 'Армрестлинг':
+            return '3-4 раза в неделю';
+        case 'Бодибилдинг':
+            return '4-6 раз в неделю';
+        default:
+            return '3-4 раза в неделю';
         }
     }
 
     getCycleNotes(cycle, userProfile) {
         const notes = [];
-        
+
         if (cycle.additionalInfo) {
             notes.push(cycle.additionalInfo);
         }
-        
+
         if (userProfile.weight < cycle.weightMin) {
             notes.push(`⚠️ Рекомендуется набрать вес до ${cycle.weightMin} кг для оптимальных результатов`);
         }
-        
+
         if (cycle.period === 'Массонабор') {
             notes.push('🍽️ Особое внимание к питанию и режиму сна');
         }
-        
+
         if (cycle.period === 'Выход на пик') {
             notes.push('🏆 Период подготовки к соревнованиям - максимальная интенсивность');
         }
-        
+
         return notes;
     }
 
@@ -278,6 +278,4 @@ ${cycle.additionalInfo ? `ℹ️ Дополнительно: ${cycle.additionalI
 }
 
 module.exports = CycleService;
-
-
 

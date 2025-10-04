@@ -5,25 +5,25 @@ describe('UserService', () => {
     let userService;
     let database;
 
-    beforeAll(async () => {
+    beforeAll(async() => {
         database = new Database();
         await database.init();
         userService = new UserService(database);
     });
 
-    afterAll(async () => {
+    afterAll(async() => {
         if (database) {
             database.close();
         }
     });
 
-    beforeEach(async () => {
+    beforeEach(async() => {
         // Очищаем тестовые данные
         await database.run('DELETE FROM users WHERE id > 1000000');
     });
 
     describe('createOrUpdateUser', () => {
-        test('should create new user', async () => {
+        test('should create new user', async() => {
             const userData = {
                 id: 1234567,
                 username: 'testuser',
@@ -32,7 +32,7 @@ describe('UserService', () => {
             };
 
             const user = await userService.createOrUpdateUser(userData);
-            
+
             expect(user).toBeDefined();
             expect(user.id).toBe(1234567);
             expect(user.username).toBe('testuser');
@@ -40,7 +40,7 @@ describe('UserService', () => {
             expect(user.last_name).toBe('User');
         });
 
-        test('should update existing user', async () => {
+        test('should update existing user', async() => {
             const userData = {
                 id: 1234567,
                 username: 'testuser',
@@ -50,7 +50,7 @@ describe('UserService', () => {
 
             // Создаем пользователя
             await userService.createOrUpdateUser(userData);
-            
+
             // Обновляем пользователя
             const updatedData = {
                 id: 1234567,
@@ -60,14 +60,14 @@ describe('UserService', () => {
             };
 
             const user = await userService.createOrUpdateUser(updatedData);
-            
+
             expect(user.username).toBe('updateduser');
             expect(user.first_name).toBe('Updated');
         });
     });
 
     describe('getUser', () => {
-        test('should return user by id', async () => {
+        test('should return user by id', async() => {
             const userData = {
                 id: 1234568,
                 username: 'testuser2',
@@ -77,19 +77,19 @@ describe('UserService', () => {
 
             await userService.createOrUpdateUser(userData);
             const user = await userService.getUser(1234568);
-            
+
             expect(user).toBeDefined();
             expect(user.id).toBe(1234568);
         });
 
-        test('should return undefined for non-existent user', async () => {
+        test('should return undefined for non-existent user', async() => {
             const user = await userService.getUser(9999999);
             expect(user).toBeUndefined();
         });
     });
 
     describe('updateUser', () => {
-        test('should update user data', async () => {
+        test('should update user data', async() => {
             const userData = {
                 id: 1234569,
                 username: 'testuser3',
@@ -98,7 +98,7 @@ describe('UserService', () => {
             };
 
             await userService.createOrUpdateUser(userData);
-            
+
             const updateData = {
                 gender: 'male',
                 weight: 75.5,
@@ -106,13 +106,13 @@ describe('UserService', () => {
             };
 
             const user = await userService.updateUser(1234569, updateData);
-            
+
             expect(user.gender).toBe('male');
             expect(user.weight).toBe(75.5);
             expect(user.height).toBe(180);
         });
 
-        test('should handle empty update data', async () => {
+        test('should handle empty update data', async() => {
             const userData = {
                 id: 1234570,
                 username: 'testuser4',
@@ -121,20 +121,20 @@ describe('UserService', () => {
             };
 
             await userService.createOrUpdateUser(userData);
-            
+
             // Подавляем console.error для этого теста
             const originalError = console.error;
             console.error = jest.fn();
-            
+
             await expect(userService.updateUser(1234570, {})).rejects.toThrow('Нет данных для обновления');
-            
+
             // Восстанавливаем console.error
             console.error = originalError;
         });
     });
 
     describe('setGender', () => {
-        test('should set user gender', async () => {
+        test('should set user gender', async() => {
             const userData = {
                 id: 1234571,
                 username: 'testuser5',
@@ -144,13 +144,13 @@ describe('UserService', () => {
 
             await userService.createOrUpdateUser(userData);
             const user = await userService.setGender(1234571, 'male');
-            
+
             expect(user.gender).toBe('male');
         });
     });
 
     describe('setWeight', () => {
-        test('should set user weight', async () => {
+        test('should set user weight', async() => {
             const userData = {
                 id: 1234572,
                 username: 'testuser6',
@@ -160,11 +160,11 @@ describe('UserService', () => {
 
             await userService.createOrUpdateUser(userData);
             const user = await userService.setWeight(1234572, 75.5);
-            
+
             expect(user.weight).toBe(75.5);
         });
 
-        test('should validate weight input', async () => {
+        test('should validate weight input', async() => {
             const userData = {
                 id: 1234573,
                 username: 'testuser7',
@@ -173,7 +173,7 @@ describe('UserService', () => {
             };
 
             await userService.createOrUpdateUser(userData);
-            
+
             await expect(userService.setWeight(1234573, 'invalid')).rejects.toThrow('Неверный формат веса');
             await expect(userService.setWeight(1234573, -10)).rejects.toThrow('Неверный формат веса');
             await expect(userService.setWeight(1234573, 0)).rejects.toThrow('Неверный формат веса');
@@ -181,7 +181,7 @@ describe('UserService', () => {
     });
 
     describe('setHeight', () => {
-        test('should set user height', async () => {
+        test('should set user height', async() => {
             const userData = {
                 id: 1234574,
                 username: 'testuser8',
@@ -191,11 +191,11 @@ describe('UserService', () => {
 
             await userService.createOrUpdateUser(userData);
             const user = await userService.setHeight(1234574, 180);
-            
+
             expect(user.height).toBe(180);
         });
 
-        test('should validate height input', async () => {
+        test('should validate height input', async() => {
             const userData = {
                 id: 1234575,
                 username: 'testuser9',
@@ -204,7 +204,7 @@ describe('UserService', () => {
             };
 
             await userService.createOrUpdateUser(userData);
-            
+
             await expect(userService.setHeight(1234575, 'invalid')).rejects.toThrow('Неверный формат роста');
             await expect(userService.setHeight(1234575, -10)).rejects.toThrow('Неверный формат роста');
             await expect(userService.setHeight(1234575, 0)).rejects.toThrow('Неверный формат роста');
@@ -212,7 +212,7 @@ describe('UserService', () => {
     });
 
     describe('setLevel', () => {
-        test('should set user level', async () => {
+        test('should set user level', async() => {
             const userData = {
                 id: 1234576,
                 username: 'testuser10',
@@ -222,11 +222,11 @@ describe('UserService', () => {
 
             await userService.createOrUpdateUser(userData);
             const user = await userService.setLevel(1234576, 'КМС');
-            
+
             expect(user.level).toBe('КМС');
         });
 
-        test('should validate level input', async () => {
+        test('should validate level input', async() => {
             const userData = {
                 id: 1234577,
                 username: 'testuser11',
@@ -235,13 +235,13 @@ describe('UserService', () => {
             };
 
             await userService.createOrUpdateUser(userData);
-            
+
             await expect(userService.setLevel(1234577, 'Invalid Level')).rejects.toThrow('Неверный уровень подготовки');
         });
     });
 
     describe('getUserProfile', () => {
-        test('should return complete user profile', async () => {
+        test('should return complete user profile', async() => {
             const userData = {
                 id: 1234578,
                 username: 'testuser12',
@@ -256,7 +256,7 @@ describe('UserService', () => {
             await userService.setLevel(1234578, 'КМС');
 
             const profile = await userService.getUserProfile(1234578);
-            
+
             expect(profile.id).toBe(1234578);
             expect(profile.gender).toBe('male');
             expect(profile.weight).toBe(75);
@@ -265,7 +265,7 @@ describe('UserService', () => {
             expect(profile.isProfileComplete).toBe(true);
         });
 
-        test('should return incomplete profile', async () => {
+        test('should return incomplete profile', async() => {
             const userData = {
                 id: 1234579,
                 username: 'testuser13',
@@ -275,7 +275,7 @@ describe('UserService', () => {
 
             await userService.createOrUpdateUser(userData);
             const profile = await userService.getUserProfile(1234579);
-            
+
             expect(profile.isProfileComplete).toBe(false);
         });
     });
@@ -319,7 +319,7 @@ describe('UserService', () => {
         test('should return null for missing data', () => {
             const bmi1 = userService.calculateBMI(null, 180);
             const bmi2 = userService.calculateBMI(75, null);
-            
+
             expect(bmi1).toBeNull();
             expect(bmi2).toBeNull();
         });
@@ -333,7 +333,7 @@ describe('UserService', () => {
     });
 
     describe('getUsersStats', () => {
-        test('should return user statistics', async () => {
+        test('should return user statistics', async() => {
             // Создаем тестовых пользователей
             await userService.createOrUpdateUser({
                 id: 1234580,
@@ -341,21 +341,21 @@ describe('UserService', () => {
                 firstName: 'User1',
                 lastName: 'Test'
             });
-            
+
             await userService.createOrUpdateUser({
                 id: 1234581,
                 username: 'user2',
                 firstName: 'User2',
                 lastName: 'Test'
             });
-            
+
             await userService.setGender(1234580, 'male');
             await userService.setWeight(1234580, 75);
             await userService.setHeight(1234580, 180);
             await userService.setLevel(1234580, 'КМС');
 
             const stats = await userService.getUsersStats();
-            
+
             expect(stats.total_users).toBeGreaterThan(0);
             expect(stats.users_with_gender).toBeGreaterThan(0);
             expect(stats.users_with_weight).toBeGreaterThan(0);

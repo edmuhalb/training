@@ -1,5 +1,5 @@
 const TrainingBot = require('../src/bot');
-const TelegramBotMock = require('./mocks/telegramBotMock');
+// const TelegramBotMock = require('./mocks/telegramBotMock');
 const Database = require('../src/database');
 
 // Мокаем node-telegram-bot-api
@@ -13,16 +13,16 @@ describe('TrainingBot Integration Tests', () => {
     let botMock;
     let database;
 
-    beforeAll(async () => {
+    beforeAll(async() => {
         // Создаем тестовую базу данных
         process.env.DATABASE_URL = './test/data/test_bot.db';
         process.env.TELEGRAM_BOT_TOKEN = 'test_token';
-        
+
         database = new Database();
         await database.init();
     });
 
-    afterAll(async () => {
+    afterAll(async() => {
         if (database) {
             database.close();
         }
@@ -45,7 +45,7 @@ describe('TrainingBot Integration Tests', () => {
     });
 
     describe('Start Command', () => {
-        test('should handle /start command', async () => {
+        test('should handle /start command', async() => {
             const message = {
                 chat: { id: 12345 },
                 from: { id: 67890, username: 'testuser', first_name: 'Test', last_name: 'User' }
@@ -61,7 +61,7 @@ describe('TrainingBot Integration Tests', () => {
     });
 
     describe('Profile Dialog', () => {
-        test('should start profile dialog with /setup_profile', async () => {
+        test('should start profile dialog with /setup_profile', async() => {
             const message = {
                 chat: { id: 12345 },
                 from: { id: 67890 }
@@ -75,7 +75,7 @@ describe('TrainingBot Integration Tests', () => {
             expect(response.text).toContain('Шаг 1 из 4');
         });
 
-        test('should handle gender selection in dialog', async () => {
+        test('should handle gender selection in dialog', async() => {
             const chatId = 12345;
             const userId = 67890;
 
@@ -100,7 +100,7 @@ describe('TrainingBot Integration Tests', () => {
     });
 
     describe('Cycle Selection', () => {
-        test('should show available cycles', async () => {
+        test('should show available cycles', async() => {
             const message = {
                 chat: { id: 12345 },
                 from: { id: 67890 }
@@ -114,7 +114,7 @@ describe('TrainingBot Integration Tests', () => {
             expect(response.options.reply_markup).toBeDefined();
         });
 
-        test('should handle cycle selection', async () => {
+        test('should handle cycle selection', async() => {
             const chatId = 12345;
             const userId = 67890;
 
@@ -145,7 +145,7 @@ describe('TrainingBot Integration Tests', () => {
     });
 
     describe('User Commands', () => {
-        test('should show profile information', async () => {
+        test('should show profile information', async() => {
             const userId = 67890;
             const chatId = 12345;
 
@@ -169,7 +169,7 @@ describe('TrainingBot Integration Tests', () => {
             expect(response.text).toContain('Ваш профиль');
         });
 
-        test('should show help information', async () => {
+        test('should show help information', async() => {
             const message = {
                 chat: { id: 12345 },
                 from: { id: 67890 }
@@ -185,7 +185,7 @@ describe('TrainingBot Integration Tests', () => {
     });
 
     describe('Error Handling', () => {
-        test('should handle invalid commands gracefully', async () => {
+        test('should handle invalid commands gracefully', async() => {
             const message = {
                 chat: { id: 12345 },
                 from: { id: 67890 },
@@ -198,7 +198,7 @@ describe('TrainingBot Integration Tests', () => {
             expect(botMock.getMessagesCount()).toBe(0);
         });
 
-        test('should handle database errors', async () => {
+        test('should handle database errors', async() => {
             // Закрываем базу данных для создания ошибки
             await bot.database.close();
 
@@ -215,7 +215,7 @@ describe('TrainingBot Integration Tests', () => {
     });
 
     describe('Dialog State Management', () => {
-        test('should cancel dialog with /cancel command', async () => {
+        test('should cancel dialog with /cancel command', async() => {
             const userId = 67890;
             const chatId = 12345;
 

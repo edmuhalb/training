@@ -23,7 +23,7 @@ class TrainingBot {
         if (!TelegramBot) {
             throw new Error('node-telegram-bot-api is required for bot functionality. Install with: npm install node-telegram-bot-api');
         }
-        
+
         this.bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
         this.app = express();
         this.database = new Database();
@@ -31,11 +31,11 @@ class TrainingBot {
         this.userService = new UserService(this.database);
         this.workoutService = new WorkoutService(this.database);
         this.dialogService = new DialogService(this.userService);
-        
+
         this.setupMiddleware();
         this.setupHandlers();
         this.setupWebhook();
-        
+
         // Инициализируем команды пользователя
         this.userCommands = new UserCommands(this.bot, this.userService);
     }
@@ -46,10 +46,10 @@ class TrainingBot {
 
     setupHandlers() {
         // Команда /start
-        this.bot.onText(/\/start/, async (msg) => {
+        this.bot.onText(/\/start/, async(msg) => {
             const chatId = msg.chat.id;
             const userId = msg.from.id;
-            
+
             try {
                 await this.userService.createOrUpdateUser({
                     id: userId,
@@ -83,13 +83,13 @@ class TrainingBot {
         });
 
         // Команда /cycles - показать доступные циклы
-        this.bot.onText(/\/cycles/, async (msg) => {
+        this.bot.onText(/\/cycles/, async(msg) => {
             const chatId = msg.chat.id;
-            
+
             try {
                 const cycles = await this.cycleService.getAvailableCycles();
                 const keyboard = this.createCyclesKeyboard(cycles);
-                
+
                 await this.bot.sendMessage(chatId, 'Выберите тренировочный цикл:', {
                     reply_markup: {
                         inline_keyboard: keyboard
@@ -102,10 +102,10 @@ class TrainingBot {
         });
 
         // Команда /profile - настройка профиля
-        this.bot.onText(/\/profile/, async (msg) => {
+        this.bot.onText(/\/profile/, async(msg) => {
             const chatId = msg.chat.id;
             const userId = msg.from.id;
-            
+
             try {
                 const user = await this.userService.getUser(userId);
                 const profileMessage = `
@@ -122,7 +122,7 @@ class TrainingBot {
 /set_height - Установить рост
 /set_level - Установить уровень подготовки
                 `;
-                
+
                 await this.bot.sendMessage(chatId, profileMessage);
             } catch (error) {
                 console.error('Ошибка при получении профиля:', error);
@@ -131,10 +131,10 @@ class TrainingBot {
         });
 
         // Команда /setup_profile - диалоговое заполнение профиля
-        this.bot.onText(/\/setup_profile/, async (msg) => {
+        this.bot.onText(/\/setup_profile/, async(msg) => {
             const chatId = msg.chat.id;
             const userId = msg.from.id;
-            
+
             try {
                 await this.dialogService.startProfileDialog(this.bot, chatId, userId);
             } catch (error) {
@@ -144,10 +144,10 @@ class TrainingBot {
         });
 
         // Команда /cancel - отмена диалога
-        this.bot.onText(/\/cancel/, async (msg) => {
+        this.bot.onText(/\/cancel/, async(msg) => {
             const chatId = msg.chat.id;
             const userId = msg.from.id;
-            
+
             try {
                 if (this.dialogService.isUserInDialog(userId)) {
                     this.dialogService.cancelDialog(userId);
@@ -162,11 +162,11 @@ class TrainingBot {
         });
 
         // Обработка callback запросов
-        this.bot.on('callback_query', async (callbackQuery) => {
+        this.bot.on('callback_query', async(callbackQuery) => {
             const chatId = callbackQuery.message.chat.id;
-            const data = callbackQuery.data;
+            const { data } = callbackQuery;
             const userId = callbackQuery.from.id;
-            
+
             try {
                 // Проверяем, находится ли пользователь в диалоге
                 if (this.dialogService.isUserInDialog(userId) && data.startsWith('dialog_')) {
@@ -176,7 +176,7 @@ class TrainingBot {
                         return;
                     }
                 }
-                
+
                 if (data.startsWith('cycle_')) {
                     const cycleId = data.replace('cycle_', '');
                     await this.handleCycleSelection(chatId, cycleId);
@@ -184,7 +184,7 @@ class TrainingBot {
                     const gender = data.replace('gender_', '');
                     await this.handleGenderSelection(chatId, userId, gender);
                 }
-                
+
                 await this.bot.answerCallbackQuery(callbackQuery.id);
             } catch (error) {
                 console.error('Ошибка при обработке callback:', error);
@@ -193,14 +193,14 @@ class TrainingBot {
         });
 
         // Обработка текстовых сообщений
-        this.bot.on('message', async (msg) => {
+        this.bot.on('message', async(msg) => {
             if (msg.text && !msg.text.startsWith('/')) {
                 // Проверяем, находится ли пользователь в диалоге
                 if (this.dialogService.isUserInDialog(msg.from.id)) {
                     const handled = await this.dialogService.handleDialogResponse(this.bot, msg);
                     if (handled) return;
                 }
-                
+
                 await this.handleTextMessage(msg);
             }
         });
@@ -208,14 +208,14 @@ class TrainingBot {
 
     createCyclesKeyboard(cycles) {
         const keyboard = [];
-        
+
         cycles.forEach(cycle => {
             keyboard.push([{
                 text: `${cycle.name} (${cycle.direction})`,
                 callback_data: `cycle_${cycle.id}`
             }]);
         });
-        
+
         return keyboard;
     }
 
@@ -223,15 +223,15 @@ class TrainingBot {
         try {
             const cycle = await this.cycleService.getCycleById(cycleId);
             const user = await this.userService.getUser(chatId);
-            
+
             if (!user.weight || !user.height || !user.gender) {
-                await this.bot.sendMessage(chatId, 
+                await this.bot.sendMessage(chatId,
                     'Для составления плана необходимо заполнить профиль. Используйте /profile');
                 return;
             }
-            
+
             const workoutPlan = await this.workoutService.generateWorkoutPlan(cycle, user);
-            
+
             const planMessage = `
 🏋️‍♂️ Ваш план тренировок:
 
@@ -242,11 +242,11 @@ ${cycle.name}
 
 ${workoutPlan.description}
 
-${workoutPlan.exercises.map((exercise, index) => 
-    `${index + 1}. ${exercise.name} - ${exercise.sets} подходов x ${exercise.reps} повторений`
-).join('\n')}
+${workoutPlan.exercises.map((exercise, index) =>
+        `${index + 1}. ${exercise.name} - ${exercise.sets} подходов x ${exercise.reps} повторений`
+    ).join('\n')}
             `;
-            
+
             await this.bot.sendMessage(chatId, planMessage);
         } catch (error) {
             console.error('Ошибка при выборе цикла:', error);
@@ -266,8 +266,8 @@ ${workoutPlan.exercises.map((exercise, index) =>
 
     async handleTextMessage(msg) {
         const chatId = msg.chat.id;
-        const text = msg.text;
-        
+        const { text } = msg;
+
         // Простая обработка текстовых команд
         if (text.includes('вес') || text.includes('weight')) {
             await this.bot.sendMessage(chatId, 'Для установки веса используйте команду /set_weight');
@@ -287,12 +287,12 @@ ${workoutPlan.exercises.map((exercise, index) =>
         try {
             await this.database.init();
             console.log('База данных инициализирована');
-            
+
             const port = process.env.PORT || 3000;
             this.app.listen(port, () => {
                 console.log(`Сервер запущен на порту ${port}`);
             });
-            
+
             console.log('Telegram бот запущен');
         } catch (error) {
             console.error('Ошибка при запуске бота:', error);
