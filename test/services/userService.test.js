@@ -8,7 +8,6 @@ describe('UserService', () => {
     beforeAll(async() => {
         database = new Database();
         await database.init();
-        await database.createTables();
         userService = new UserService(database);
     });
 
