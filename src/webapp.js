@@ -71,6 +71,9 @@ class WebApp {
     // Get user profile
     async getProfile(req, res) {
         try {
+            if (!this.userService) {
+                return res.status(503).json({ message: 'Service not initialized' });
+            }
             // For demo purposes, we'll use a default user ID
             // In a real app, you'd get this from Telegram WebApp data
             const userId = 1;
@@ -347,7 +350,18 @@ module.exports = WebApp;
 // For Vercel serverless functions
 if (process.env.VERCEL) {
     const webapp = new WebApp();
-    // Initialize the app for Vercel
-    webapp.start().catch(console.error);
+    // Initialize database and services for Vercel
+    webapp.database.init().then(() => {
+        return webapp.database.createTables();
+    }).then(() => {
+        // Initialize services after database is ready
+        webapp.userService = new (require('./services/userService'))(webapp.database);
+        webapp.cycleService = new (require('./services/cycleService'))(webapp.database);
+        webapp.workoutService = new (require('./services/workoutService'))(webapp.database);
+        webapp.maxWeightService = new (require('./services/maxWeightService'))(webapp.database);
+        console.log('Vercel WebApp initialized successfully');
+    }).catch((error) => {
+        console.error('Error initializing Vercel WebApp:', error);
+    });
     module.exports = webapp.app;
 }
