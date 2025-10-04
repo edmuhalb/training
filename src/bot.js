@@ -1,4 +1,11 @@
-const TelegramBot = require('node-telegram-bot-api');
+// Optional dependency - install with: npm install node-telegram-bot-api
+let TelegramBot;
+try {
+    TelegramBot = require('node-telegram-bot-api');
+} catch (error) {
+    console.log('node-telegram-bot-api not installed. Bot functionality disabled.');
+    TelegramBot = null;
+}
 const express = require('express');
 const dotenv = require('dotenv');
 const Database = require('./database');
@@ -13,6 +20,10 @@ dotenv.config();
 
 class TrainingBot {
     constructor() {
+        if (!TelegramBot) {
+            throw new Error('node-telegram-bot-api is required for bot functionality. Install with: npm install node-telegram-bot-api');
+        }
+        
         this.bot = new TelegramBot(process.env.TELEGRAM_BOT_TOKEN, { polling: true });
         this.app = express();
         this.database = new Database();
