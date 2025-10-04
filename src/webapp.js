@@ -382,13 +382,13 @@ if (process.env.VERCEL) {
         run: () => Promise.resolve(),
         all: () => Promise.resolve([])
     };
-    
+
     // Initialize services with mock database
     webapp.userService = new (require('./services/userService'))(webapp.database);
     webapp.cycleService = new (require('./services/cycleService'))(webapp.database);
     webapp.workoutService = new (require('./services/workoutService'))(webapp.database);
     webapp.maxWeightService = new (require('./services/maxWeightService'))(webapp.database);
-    
+
     console.log('Vercel WebApp initialized with mock database');
     module.exports = webapp.app;
 }
