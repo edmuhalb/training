@@ -4,7 +4,7 @@ const Database = require('../../src/database');
 describe('UserService', () => {
     let userService;
     let database;
-    
+
     // Увеличиваем таймаут для тестов
     jest.setTimeout(10000);
 
@@ -28,7 +28,7 @@ describe('UserService', () => {
             await database.run('DELETE FROM users WHERE id > 1000000');
         } catch (error) {
             // Игнорируем ошибки очистки
-            console.log('Cleanup error (ignored):', error.message);
+            // console.log('Cleanup error (ignored):', error.message);
         }
     });
 
@@ -133,12 +133,15 @@ describe('UserService', () => {
             await userService.createOrUpdateUser(userData);
 
             // Подавляем console.error для этого теста
+            // eslint-disable-next-line no-console
             const originalError = console.error;
+            // eslint-disable-next-line no-console
             console.error = jest.fn();
 
             await expect(userService.updateUser(1234570, {})).rejects.toThrow('Нет данных для обновления');
 
             // Восстанавливаем console.error
+            // eslint-disable-next-line no-console
             console.error = originalError;
         });
     });

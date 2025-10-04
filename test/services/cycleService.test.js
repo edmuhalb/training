@@ -2,7 +2,7 @@ const CycleService = require('../../src/services/cycleService');
 
 describe('CycleService', () => {
     let cycleService;
-    
+
     // Увеличиваем таймаут для тестов
     jest.setTimeout(10000);
 
