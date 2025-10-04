@@ -19,11 +19,12 @@ class Database {
 
             this.db = new sqlite3.Database(this.dbPath, (err) => {
                 if (err) {
+                    // eslint-disable-next-line no-console
                     console.error('Ошибка подключения к базе данных:', err);
                     reject(err);
                 } else {
                     // eslint-disable-next-line no-console
-        console.log('Подключение к базе данных установлено');
+                    console.log('Подключение к базе данных установлено');
                     this.createTables().then(resolve).catch(reject);
                 }
             });
