@@ -17,23 +17,29 @@ describe('DialogService', () => {
         await database.init();
         // Убеждаемся, что таблицы созданы
         await database.createTables();
+        // Небольшая задержка для завершения создания таблиц
+        await new Promise(resolve => setTimeout(resolve, 100));
         userService = new UserService(database);
         dialogService = new DialogService(userService);
         botMock = new TelegramBotMock();
+    });
+
+    beforeEach(async() => {
+        botMock.clearMessages();
+        // Очищаем тестовые данные
+        try {
+            await database.run('DELETE FROM users WHERE id > 1000000');
+        } catch (error) {
+            // Игнорируем ошибки очистки
+        }
+        // Очищаем состояния диалогов
+        dialogService.userStates.clear();
     });
 
     afterAll(async() => {
         if (database) {
             database.close();
         }
-    });
-
-    beforeEach(async() => {
-        botMock.clearMessages();
-        // Очищаем тестовые данные
-        await database.run('DELETE FROM users WHERE id > 1000000');
-        // Очищаем состояния диалогов
-        dialogService.userStates.clear();
     });
 
     describe('startProfileDialog', () => {
