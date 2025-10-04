@@ -196,6 +196,7 @@ class WebApp {
         try {
             // Initialize database
             await this.database.init();
+            await this.database.createTables();
             console.log('Database initialized');
 
             // Initialize default data
